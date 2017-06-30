@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image i = reader.acquireLatestImage();
+            Image i = reader.acquireLatestImage(); 
             if (i == null){
                 return;
             }

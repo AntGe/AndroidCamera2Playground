@@ -5,9 +5,8 @@
     android:layout_height="match_parent"
     tools:context="co.centroida.androidcamera2.MainActivity">
 
-    <co.centroida.barkoderetake.AutoFitTextureView
+    <co.centroida.androidcamera2.AutoFitTextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"  />
-
 </FrameLayout>

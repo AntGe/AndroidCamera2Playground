@@ -60,17 +60,35 @@ public class AutoFitTextureView extends TextureView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width=MeasureSpec.getSize(widthMeasureSpec);
+        int height=MeasureSpec.getSize(heightMeasureSpec);
+        boolean isFullBleed=true;
         if (0 == mRatioWidth || 0 == mRatioHeight) {
             setMeasuredDimension(width, height);
-        } else {
-            if (width < height * mRatioWidth / mRatioHeight) {
-                setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
-            } else {
-                setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
+        }
+
+        else {
+            if (isFullBleed) {
+                if (width>height*mRatioWidth/mRatioHeight) {
+                    setMeasuredDimension(width,
+                            width*mRatioHeight/mRatioWidth);
+                }
+                else {
+                    setMeasuredDimension(height*mRatioWidth/mRatioHeight,
+                            height);
+                }
+            }
+            else {
+                if (width<height*mRatioWidth/mRatioHeight) {
+                    setMeasuredDimension(width,
+                            width*mRatioHeight/mRatioWidth);
+                }
+                else {
+                    setMeasuredDimension(height*mRatioWidth/mRatioHeight,
+                            height);
+                }
             }
         }
     }
-
 }
