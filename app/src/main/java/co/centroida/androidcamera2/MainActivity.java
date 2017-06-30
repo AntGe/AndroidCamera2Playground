@@ -39,6 +39,8 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image i = reader.acquireLatestImage(); 
+            Image i = reader.acquireLatestImage();
             if (i == null){
                 return;
             }
@@ -241,6 +243,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Window window = getWindow();
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.setStatusBarColor(
+                window.getContext()
+                        .getResources()
+                        .getColor(android.R.color.transparent));
 
         mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
 
