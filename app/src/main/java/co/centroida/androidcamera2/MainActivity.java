@@ -37,12 +37,18 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
+import android.util.SparseArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -88,9 +94,23 @@ public class MainActivity extends AppCompatActivity {
             if (i == null){
                 return;
             }
+            try{
+                if (i.getPlanes()[0] != null){
+                    if (mDetector.isOperational()){
+                        ByteBuffer bb = ByteBuffer.wrap(convertYUV420888ToNV21(i));
+                        Frame frame = new Frame.Builder().setImageData(bb, i.getWidth(), i.getHeight(), ImageFormat.NV21).build();
+                        SparseArray<Barcode> barcodes = mDetector.detect(frame);
+                        Barcode b = barcodes.valueAt(0);
+                        if (b != null){
+                            Log.d(TAG, "BARCODE: " + barcodes.valueAt(0).rawValue);
+                        }
+                    }
+                }
+            }catch (Exception e){
+                i.close();
+            }
             i.close();
         }
-
     };
 
     /**
@@ -239,6 +259,8 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    private BarcodeDetector mDetector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -273,6 +295,15 @@ public class MainActivity extends AppCompatActivity {
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        }
+
+        mDetector =
+                new BarcodeDetector.Builder(getApplicationContext())
+                        .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
+                        .build();
+        if(!mDetector.isOperational()){
+            Log.d(TAG, "onResume: Could not set up the detector!");
+            return;
         }
     }
 
@@ -649,6 +680,19 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
                 }
             });
+    }
+
+    private byte[] convertYUV420888ToNV21(Image imgYUV420) {
+        // Converting YUV_420_888 data to YUV_420_SP (NV21).
+        byte[] data;
+        ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
+        ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
+        int buffer0_size = buffer0.remaining();
+        int buffer2_size = buffer2.remaining();
+        data = new byte[buffer0_size + buffer2_size];
+        buffer0.get(data, 0, buffer0_size);
+        buffer2.get(data, buffer0_size, buffer2_size);
+        return data;
     }
 
     static class CompareSizesByArea implements Comparator<Size> {
