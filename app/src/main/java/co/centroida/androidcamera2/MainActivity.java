@@ -40,6 +40,7 @@ import android.util.Size;
 import android.util.SparseArray;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -401,6 +402,11 @@ public class MainActivity extends AppCompatActivity {
                     continue;
                 }
 
+                int[] formats = map.getOutputFormats();
+                for (int i : formats
+                     ) {
+                    Log.d(TAG, "format found" + i);
+                }
                 // For still image captures, we use the largest available size.
                 Size largest = Collections.max(
                         Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
@@ -459,10 +465,10 @@ public class MainActivity extends AppCompatActivity {
                         maxPreviewHeight, largest);
 
                 mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(),
-                        ImageFormat.YUV_420_888, 60);
+                        ImageFormat.YUV_420_888, 20);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
-
+                Log.d(TAG, "mImageReader: " + mImageReader.getImageFormat());
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -500,6 +506,8 @@ public class MainActivity extends AppCompatActivity {
             // We set up a CaptureRequest.Builder with the output Surface.
             mPreviewRequestBuilder
                     = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            Log.d(TAG, "createCameraPreviewSession: " + mTextureView.getHeight() + " widtg = " + mTextureView.getWidth());
+            Log.d(TAG, "createCameraPreviewSession: " + mImageReader.getHeight() + " widtg = " + mImageReader.getWidth());
             mPreviewRequestBuilder.addTarget(surface);
             mPreviewRequestBuilder.addTarget(mImageReader.getSurface());
 
